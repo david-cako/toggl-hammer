@@ -1,7 +1,7 @@
 # toggl-hammer
 toggl for lazy people.
 
-![](https://i.imgur.com/36RGSeW.png)
+![](https://i.imgur.com/EQGRTp8.png)
 
 ####Who this is for:
 People who need to quickly create hourly toggl entries without sensitivity for time of day (all entries are at 09:00 or however DST screws that up).
