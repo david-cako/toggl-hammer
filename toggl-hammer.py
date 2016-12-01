@@ -8,10 +8,14 @@ import json
 
 API_KEY = os.environ['TOGGL_API_KEY']
 
-# BETTER CHANGE THESE HARDCODED SIGNS IF YOU LIVE EAST OF GMT
-# ...BETTER YET, HARD CODE THE ENTIRE TIMEZONE IF YOUR TIMEZONE DOESNT CHANGE TWICE A YEAR
-TIMEZONE_ENCODED = "%2D0" + str(int(timezone/3600)) + "%3A00" 
-TIMEZONE = "-0" + str(int(timezone/3600)) + ":00"
+# GOTTA INVERT AND ENCODE THOSE SIGNS
+if timezone <= 0:
+    TIMEZONE_ENCODED = "%2B0" + str(int(-timezone/3600)) + "%3A00"
+    TIMEZONE = "+0" + str(int(-timezone/3600)) + ":00"
+else:
+    TIMEZONE_ENCODED = "%2D0" + str(int(timezone/3600)) + "%3A00" 
+    TIMEZONE = "-0" + str(int(timezone/3600)) + ":00"
+
 DAY_INDEX = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 class TogglCli():
