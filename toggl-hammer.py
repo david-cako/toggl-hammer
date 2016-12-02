@@ -1,10 +1,8 @@
-#!/usr/bin/python3
-import requests
-import os
+#!/usr/local/bin/python3
+import os, requests, json, signal, sys
 from datetime import date, timedelta, datetime
 from time import timezone
 from collections import OrderedDict
-import json
 
 API_KEY = os.environ['TOGGL_API_KEY']
 
@@ -71,6 +69,12 @@ class TogglCli():
             self.time_log[date] = self.time_log[date] + float(hours_input)
             print("[ {0} hours logged for {1} ]".format(hours_input, project[0]))
             print('')
+
+def handler(signum, frame):
+    print('')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, handler)
 
 hammer = TogglCli()
 
