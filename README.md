@@ -15,7 +15,7 @@ Get your toggl API key from your account settings page and add it as an environm
 
     export TOGGL_API_KEY=[YOUR KEY HERE]
 
-And then use pip from parent directory to install:
+And then install with pip (from parent directory):
 
     pip install toggl_hammer
 
@@ -23,6 +23,6 @@ And then use pip from parent directory to install:
 
 toggl\_hammer may be invoked with or without a "week range" argument, defaulting to 2 weeks:
 
-    toggl_hammer [week range]
+    toggl_hammer 4
 
 Exit with `ctrl + c`.
