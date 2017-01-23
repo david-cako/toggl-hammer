@@ -34,7 +34,7 @@ class TogglCli():
         self.date_range = date.today() - timedelta(weeks=week_range)
         self.user_obj = requests.get('https://www.toggl.com/api/v8/me?with_related_data=true', auth=(API_KEY, 'api_token')).json()
         self.projects = [(x['name'], x['id']) for x in self.user_obj['data']['projects']] # comprehension returning list of (name, id) pairs
-        # get last 2 weeks of entries
+        # get last [week_range] weeks of entries
         self.time_entries = requests.get('https://www.toggl.com/api/v8/time_entries?start_date=' + \
                 str(self.date_range) + 'T00:00:00' + TIMEZONE_ENCODED, auth=(API_KEY, 'api_token')).json()
         self.time_log = OrderedDict()
