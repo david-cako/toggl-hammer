@@ -1,5 +1,5 @@
 from datetime import date
 import holidays
 
-us_holidays = holidays.UnitedStates()
+holidays_export = holidays.UnitedStates()
 

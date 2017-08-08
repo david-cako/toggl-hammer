@@ -3,7 +3,7 @@ import os, requests, json, signal, sys
 from datetime import date, timedelta, datetime
 from time import timezone
 from collections import OrderedDict
-from .us_holidays import us_holidays
+from .us_holidays import holidays_export as holidays
 
 API_KEY = os.environ['TOGGL_API_KEY']
 
@@ -21,8 +21,8 @@ class LogEntry():
     def __init__(self, date_input):
         self.date = date_input
         self.time = 0 
-        if date_input in us_holidays:
-            self.holiday = us_holidays.get(date_input)
+        if date_input in holidays:
+            self.holiday = holidays.get(date_input)
         else:
             self.holiday = None
     def toHours(self):
@@ -48,6 +48,7 @@ class TogglCli():
             entry.toHours()  # after iterating through each individual entry (many days having multiple), convert time to hours  
 
     def date_prompt(self):
+        print("")
         print("existing hours: ")
         for i, entry in enumerate(self.time_log.values()):
             weekday = DAY_INDEX[datetime.strptime(str(entry.date), "%Y-%m-%d").weekday()]
@@ -55,22 +56,54 @@ class TogglCli():
                 print("[{0:2}] {1:3} {2} - {3} hours - {4}".format(i, weekday, entry.date, entry.time, entry.holiday)) # item(ISO date, existing hours)
             else:
                 print("[{0:2}] {1:3} {2} - {3} hours".format(i, weekday, entry.date, entry.time)) # item(ISO date, existing hours)
-        date_index = int(input("select date: "))
-        print("")
-        self.entry_prompt(date_index)
+        date_index = input("select date(s): ")
+        print("")           
+        if date_index.find("-") != -1:
+            date_range = date_index.split("-")
+            if len(date_range) != 2:
+                print("Invalid date selection.  Expected int or range (i.e., '1-5').")
+                return
+            else:
+                self.entry_prompt(list(
+                    range(int(date_range[0]), int(date_range[1]) + 1)
+                ))
+        else:
+            try:
+                self.entry_prompt(int(date_index))
+            except ValueError: 
+                print("Invalid date selection.  Expected int or range (i.e., '1-5').")
 
     def entry_prompt(self, date_index):
-        print("selected date: {0}".format(str(self.time_log.values()[date_index].date)))
+        if type(date_index) == list:
+            print("selected date range: {0} - {1}".format(
+                str(
+                    list(self.time_log.values())[date_index[0]].date
+                ),
+                str(
+                    list(self.time_log.values())[date_index[-1]].date
+                ),
+            ))
+        else:
+            print("selected date: {0}".format(str(
+                list(self.time_log.values())[date_index].date
+            )))
         for i, project in enumerate(self.projects):
             print("[{0}] {1}".format(i, project[0]))
         proj_index = input("choose project: ")
         proj_index = int(proj_index)
         hours_index = int(input("input hours: "))
-        self.create_entry(proj_index, date_index, hours_index)
+        print("")
+        if type(date_index) == list:
+            for each in date_index:
+                self.create_entry(proj_index, each, hours_index)
+        else:
+            self.create_entry(proj_index, date_index, hours_index)            
     
     def create_entry(self, proj_index, date_index, hours_index):
         project = self.projects[proj_index]
-        date = str(self.time_log.values()[date_index].date)
+        date = str(
+            list(self.time_log.values())[date_index].date
+        )
         time_entry = {'time_entry':{
                 "pid": project[1], 
                 "start": date + "T09:00:00.000" + TIMEZONE,
@@ -82,8 +115,7 @@ class TogglCli():
             print(entry.text)
         else:
             self.time_log[date].time = self.time_log[date].time + float(hours_index)
-            print("[ {0} hours logged for {1} ]".format(hours_index, project[0]))
-            print('')
+            print("[ {0} hours logged for {1} on {2} ]".format(hours_index, project[0], date))
 
 def handler(signum, frame):
     print('')

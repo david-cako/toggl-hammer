@@ -25,4 +25,6 @@ toggl\_hammer may be invoked with or without a "week range" argument, defaulting
 
     toggl_hammer 4
 
+At the date prompt, you may supply either a single index (i.e., "1"), or a range (i.e., "1-5").
+
 Exit with `ctrl + c`.
