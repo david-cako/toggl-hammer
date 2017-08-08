@@ -11,13 +11,15 @@ People who need to specify times and descriptions for their entries.
 
 ## Setup:
 
+**Requires python3.**
+
 Get your toggl API key from your account settings page and add it as an environment variable to your `.bashrc` or `.bash_profile` (macOS).
 
     export TOGGL_API_KEY=[YOUR KEY HERE]
 
 And then install with pip (from parent directory):
 
-    pip install toggl_hammer
+    pip3 install toggl_hammer
 
 ## Usage:
 
