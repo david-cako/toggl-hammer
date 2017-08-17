@@ -1,5 +1,5 @@
 # toggl-hammer
-toggl for lazy people.
+toggl command line interface for lazy people.
 
 ![](https://i.imgur.com/EQGRTp8.png)
 
