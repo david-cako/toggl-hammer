@@ -93,31 +93,38 @@ class TogglCli():
         proj_index = int(proj_index)
         proj_id = self.projects[proj_index][1]
         task_list = requests.get('https://www.toggl.com/api/v8/projects/' + str(proj_id) + '/tasks', auth=(API_KEY, 'api_token')).json()
-        for i, task in enumerate(task_list):
-            print("[{0}] {1}".format(i, task['name']))
-        task_index = input("choose task: ")
-        task_index = int(task_index)
-        task_id = task_list[task_index]['id']
+        
+        if task_list != None:
+            for i, task in enumerate(task_list):
+                print("[{0}] {1}".format(i, task['name']))
+            task_index = input("choose task: ")
+            task_index = int(task_index)
+            task_id = task_list[task_index]['id']
+        else:
+            task_id = None
+
         hours_index = int(input("input hours: "))
         print("")
         if type(date_index) == list:
             for each in date_index:
-                self.create_entry(proj_index, task_id, each, hours_index)
+                self.create_entry(proj_index, each, hours_index, task_id)
         else:
-            self.create_entry(proj_index, task_id, date_index, hours_index)
+            self.create_entry(proj_index, date_index, hours_index, task_id)
     
-    def create_entry(self, proj_index, task_id, date_index, hours_index):
+    def create_entry(self, proj_index, date_index, hours_index, task_id=None):
         project = self.projects[proj_index]
         date = str(
             list(self.time_log.values())[date_index].date
         )
         time_entry = {'time_entry':{
                 "pid": project[1],
-                "tid": task_id,
                 "start": date + "T09:00:00.000" + TIMEZONE,
                 "duration": hours_index*3600,
                 "created_with": "toggl-hammer"
         }}
+        if task_id != None:
+            time_entry["time_entry"]["tid"] = task_id
+
         entry = requests.post('https://www.toggl.com/api/v8/time_entries', auth=(API_KEY, 'api_token'), data=json.dumps(time_entry))
         if not entry: # request.Response returns True if status 'OK'
             print(entry.text)
