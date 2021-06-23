@@ -120,6 +120,7 @@ class TogglCli():
                 "pid": project[1],
                 "start": date + "T09:00:00.000" + TIMEZONE,
                 "duration": hours_index*3600,
+                "description": "description",
                 "created_with": "toggl-hammer"
         }}
         if task_id != None:
