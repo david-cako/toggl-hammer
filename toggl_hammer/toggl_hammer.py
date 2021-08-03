@@ -12,7 +12,7 @@ if timezone <= 0:
     TIMEZONE_ENCODED = "%2B0" + str(int(-timezone/3600)) + "%3A00"
     TIMEZONE = "+0" + str(int(-timezone/3600)) + ":00"
 else:
-    TIMEZONE_ENCODED = "%2D0" + str(int(timezone/3600)) + "%3A00" 
+    TIMEZONE_ENCODED = "%2D0" + str(int(timezone/3600)) + "%3A00"
     TIMEZONE = "-0" + str(int(timezone/3600)) + ":00"
 
 DAY_INDEX = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -20,14 +20,14 @@ DAY_INDEX = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 class LogEntry():
     def __init__(self, date_input):
         self.date = date_input
-        self.time = 0 
+        self.time = 0
         if date_input in holidays:
             self.holiday = holidays.get(date_input)
         else:
             self.holiday = None
     def toHours(self):
         if self.time != 0:
-            self.time = float(self.time/3600) # cast non-zero times as float, making empty days easy to see 
+            self.time = float(self.time/3600) # cast non-zero times as float, making empty days easy to see
 
 class TogglCli():
     def __init__(self, week_range):
@@ -41,13 +41,13 @@ class TogglCli():
                 str(self.date_range) + 'T00:00:00' + TIMEZONE_ENCODED, auth=(API_KEY, 'api_token')).json()
         self.time_log = OrderedDict()
         while self.date_range <= self.last_day_month:
-            self.time_log[str(self.date_range)] = LogEntry(self.date_range) 
+            self.time_log[str(self.date_range)] = LogEntry(self.date_range)
             self.date_range = self.date_range + timedelta(days=1)
         for entry in self.time_entries:
             entry_date = entry['start'].split('T')[0] # split date from time
             self.time_log[entry_date].time = self.time_log[entry_date].time + entry['duration']
         for entry in self.time_log.values():
-            entry.toHours()  # after iterating through each individual entry (many days having multiple), convert time to hours  
+            entry.toHours()  # after iterating through each individual entry (many days having multiple), convert time to hours
 
     def date_prompt(self):
         print("")
@@ -59,7 +59,7 @@ class TogglCli():
             else:
                 print("[{0:2}] {1:3} {2} - {3} hours".format(i, weekday, entry.date, entry.time)) # item(ISO date, existing hours)
         date_index = input("select date(s): ")
-        print("")           
+        print("")
         if date_index.find("-") != -1:
             date_range = date_index.split("-")
             if len(date_range) != 2:
@@ -72,7 +72,7 @@ class TogglCli():
         else:
             try:
                 self.entry_prompt(int(date_index))
-            except ValueError: 
+            except ValueError:
                 print("Invalid date selection.  Expected int or range (i.e., '1-5').")
 
     def entry_prompt(self, date_index):
@@ -95,7 +95,7 @@ class TogglCli():
         proj_index = int(proj_index)
         proj_id = self.projects[proj_index][1]
         task_list = requests.get('https://www.toggl.com/api/v8/projects/' + str(proj_id) + '/tasks', auth=(API_KEY, 'api_token')).json()
-        
+
         if task_list != None:
             for i, task in enumerate(task_list):
                 print("[{0}] {1}".format(i, task['name']))
@@ -112,7 +112,7 @@ class TogglCli():
                 self.create_entry(proj_index, each, hours_index, task_id)
         else:
             self.create_entry(proj_index, date_index, hours_index, task_id)
-    
+
     def create_entry(self, proj_index, date_index, hours_index, task_id=None):
         project = self.projects[proj_index]
         date = str(
@@ -127,6 +127,9 @@ class TogglCli():
         }}
         if task_id != None:
             time_entry["time_entry"]["tid"] = task_id
+
+        if 'TOGGL_BILLABLE' in os.environ and os.environ['TOGGL_BILLABLE']:
+            time_entry["time_entry"]["billable"] = True
 
         entry = requests.post('https://www.toggl.com/api/v8/time_entries', auth=(API_KEY, 'api_token'), data=json.dumps(time_entry))
         if not entry: # request.Response returns True if status 'OK'
@@ -149,4 +152,3 @@ def main():
     hammer = TogglCli(week_range)
     while True:
         hammer.date_prompt()
-
