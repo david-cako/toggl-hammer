@@ -17,6 +17,10 @@ Get your toggl API key from your account settings page and add it as an environm
 
     export TOGGL_API_KEY=[YOUR KEY HERE]
 
+Optionally, add an extra variable to set your time entry as billable:
+
+    export TOGGL_BILLABLE=True
+
 And then install with pip (from parent directory):
 
     pip3 install toggl_hammer
